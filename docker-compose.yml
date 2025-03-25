@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  web:
+    container_name: fastapi_url_shortener
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      DATABASE_URL: postgresql://user:kek228@postgres:5432/postgres
+      REDIS_HOST: redis
+    restart: unless-stopped
+
+  postgres:
+    container_name: postgres_url
+    image: postgres:14
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: kek228
+      POSTGRES_DB: shortener
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+  redis:
+    container_name: redis_url
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --replica-read-only no
+    restart: always
